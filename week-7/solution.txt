@@ -1,0 +1,45 @@
+import requests
+import json
+import pickle
+
+response = requests.get('https://jsonplaceholder.typicode.com/users')
+
+res = {
+    "statistics" : [
+        
+    ]
+}
+tmp_dict = {
+    "username": "sam",
+    "email": "dasdsada"
+}
+
+post_counter = 0
+usr_counter = 1
+cmmnts = 0
+for item in response.json():
+    usrname = item["username"]
+    email = item["email"]
+
+    posts = requests.get('https://jsonplaceholder.typicode.com/posts/')
+    for post in posts.json():
+        if post["userId"] == usr_counter:
+            post_counter += 1
+    comments = requests.get('https://jsonplaceholder.typicode.com/comments')
+    for comment in comments.json():
+        if comment["email"] == email:
+            cmmnts += 1
+    res["statistics"].append({
+        "id" : usr_counter,
+        "username": usrname,
+        "email" : email,
+        "posts": post_counter,
+        "comments" : cmmnts
+    })
+    usr_counter+=1
+    post_counter = 0
+    
+print(res) для наглядности 
+response = requests.post('https://webhook.site/48bfc464-514b-4c4b-b1f1-8f4087898713', json=res)
+with open("solution.py", 'wb') as f:
+    pickle.dump(response, f)
